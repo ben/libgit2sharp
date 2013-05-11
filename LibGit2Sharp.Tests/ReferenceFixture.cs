@@ -799,7 +799,7 @@ namespace LibGit2Sharp.Tests
         {
             using (var repo = new Repository(StandardTestRepoWorkingDirPath))
             {
-                var result = repo.Refs.thing(repo.Refs, new[] { repo.Lookup<Commit>("f8d44d7"), repo.Lookup<Commit>("6dcf9bf") });
+                var result = repo.Refs.SubsetOfTheseReferencesThatCanReachAnyOfTheseCommits(repo.Refs, new[] { repo.Lookup<Commit>("f8d44d7"), repo.Lookup<Commit>("6dcf9bf") });
                 // Should get "i-do-numbers" and "diff-test-cases"
                 var expected = new []
                 {

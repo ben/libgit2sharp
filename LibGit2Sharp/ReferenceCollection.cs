@@ -334,7 +334,7 @@ namespace LibGit2Sharp
             return new ReflogCollection(repo, reference.CanonicalName);
         }
 
-        public virtual IEnumerable<Reference> thing(IEnumerable<Reference> refs, IEnumerable<Commit> targets)
+        public virtual IEnumerable<Reference> SubsetOfTheseReferencesThatCanReachAnyOfTheseCommits(IEnumerable<Reference> refs, IEnumerable<Commit> targets)
         {
             var result = new List<Reference>();
             var targetsList = targets.ToList();
