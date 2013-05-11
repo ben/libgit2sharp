@@ -216,7 +216,7 @@ namespace LibGit2Sharp
             }
         }
 
-        public void RewriteHistory(
+        public virtual void RewriteHistory(
             IEnumerable<Commit> commits,
             Func<Commit, CommitHeader> commitHeaderRewriter = null,
             Func<Commit, TreeDefinition> commitTreeRewriter = null)
