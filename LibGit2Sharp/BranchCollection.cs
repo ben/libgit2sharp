@@ -216,7 +216,7 @@ namespace LibGit2Sharp
             }
         }
 
-        public void RewriteHistory(IEnumerable<Commit> commits, Func<Commit, CommitDetails> commitDetailsRewriter)
+        public void RewriteHistory(IEnumerable<Commit> commits, Func<Commit, CommitHeader> commitHeaderRewriter = null, Func<Commit, TreeDefinition> commitTreeRewriter = null )
         {
             IList<Reference> originalRefs = repo.Refs.ToList();
             if (originalRefs.Count == 0)
@@ -228,7 +228,6 @@ namespace LibGit2Sharp
             // Find out which refs lead to at which one the commits
 
 
-            throw new NotImplementedException();
         }
     }
 }
