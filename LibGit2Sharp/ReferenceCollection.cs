@@ -333,5 +333,23 @@ namespace LibGit2Sharp
 
             return new ReflogCollection(repo, reference.CanonicalName);
         }
+
+        public virtual IEnumerable<Reference> thing(IEnumerable<Reference> refs, IEnumerable<Commit> targets)
+        {
+            var result = new List<Reference>();
+            var targetsList = targets.ToList();
+
+            foreach (var reference in refs)
+            {
+                foreach (var commit in repo.Commits.QueryBy(new Filter{Since = reference}))
+                {
+                    if (!targetsList.Contains(commit)) continue;
+                    result.Add(reference);
+                    break;
+                }
+            }
+
+            return result;
+        }
     }
 }

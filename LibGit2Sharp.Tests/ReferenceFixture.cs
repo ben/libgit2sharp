@@ -793,5 +793,25 @@ namespace LibGit2Sharp.Tests
             Assert.NotNull(reflogEntry.Commiter.Name);
             Assert.Equal(logMessage, reflogEntry.Message);
         }
+
+        [Fact]
+        public void CanDoThing()
+        {
+            using (var repo = new Repository(StandardTestRepoWorkingDirPath))
+            {
+                var result = repo.Refs.thing(repo.Refs, new[] { repo.Lookup<Commit>("f8d44d7"), repo.Lookup<Commit>("6dcf9bf") });
+                // Should get "i-do-numbers" and "diff-test-cases"
+                var expected = new []
+                {
+                    "refs/heads/diff-test-cases",
+                    "refs/heads/i-do-numbers",
+                    "refs/remotes/origin/test",
+                    "refs/tags/e90810b",
+                    "refs/tags/lw",
+                    "refs/tags/test",
+                };
+                Assert.Equal(expected, result.Select(x => x.CanonicalName).OrderBy(x => x));
+            }
+        }
     }
 }
