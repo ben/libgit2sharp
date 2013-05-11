@@ -15,14 +15,17 @@ namespace LibGit2Sharp.Tests
             {
                 var originalRefs = repo.Refs.ToList().OrderBy(r => r.CanonicalName);
                 IEnumerable<Commit> enumerable = repo.Refs.Select(r => r.ResolveToDirectReference().Target).Where(o => o is Commit).Cast<Commit>();
+                var commits = repo.Commits.QueryBy(new Filter {Since = repo.Refs}).ToArray();
 
                 // Noop header rewriter
                 repo.Branches.RewriteHistory(enumerable, commitHeaderRewriter: c => CommitHeader.From(c));
                 Assert.Equal(originalRefs, repo.Refs.ToList().OrderBy(r => r.CanonicalName));
+                Assert.Equal(commits, repo.Commits.QueryBy(new Filter { Since = repo.Refs }).ToArray());
 
                 // Noop tree rewriter
                 repo.Branches.RewriteHistory(enumerable, commitTreeRewriter: c => TreeDefinition.From(c.Tree));
                 Assert.Equal(originalRefs, repo.Refs.ToList().OrderBy(r => r.CanonicalName));
+                Assert.Equal(commits, repo.Commits.QueryBy(new Filter { Since = repo.Refs }).ToArray());
             }
         }
     }
