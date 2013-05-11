@@ -215,5 +215,20 @@ namespace LibGit2Sharp
                     "Count = {0}", this.Count());
             }
         }
+
+        public void RewriteHistory(IEnumerable<Commit> commits, Func<Commit, CommitDetails> commitDetailsRewriter)
+        {
+            IList<Reference> originalRefs = repo.Refs.ToList();
+            if (originalRefs.Count == 0)
+            {
+                // No ref to rewrite. What should we do here? Silently return? Throw InvalidOperationException?
+                return;
+            }
+
+            // Find out which refs lead to at which one the commits
+
+
+            throw new NotImplementedException();
+        }
     }
 }
