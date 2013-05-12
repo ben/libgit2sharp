@@ -124,37 +124,40 @@ namespace LibGit2Sharp.Tests
             }
         }
 
+        // Graft the orphan "test" branch to the tip of "packed"
+        //
+        // Before:
+        // * e90810b  (test, lw, e90810b, test)
+        // |
+        // * 6dcf9bf
+        //     <------------------ note: no connection
+        // * 41bc8c6  (packed)
+        // |
+        // * 5001298
+        //
+        // ... and after:
+        //
+        // * f558880  (test, lw, e90810b, test)
+        // |
+        // * 0c25efa
+        // |   <------------------ add this link
+        // * 41bc8c6  (packed)
+        // |
+        // * 5001298
         [Fact]
         public void CanRewriteParents()
         {
             string path = CloneBareTestRepo();
             using (var repo = new Repository(path))
             {
-                // Graft the orphan "test" branch to the tip of "packed"
-                // Before:
-                // * e90810b  (test, lw, e90810b, test)
-                // |
-                // * 6dcf9bf
-                //
-                // * 41bc8c6  (packed)
-                // |
-                // * 5001298
-                // ... and after:
-                // * f558880  (test, lw, e90810b, test)
-                // |
-                // * 0c25efa
-                // |   <---- add this link
-                // * 41bc8c6  (packed)
-                // |
-                // * 5001298
                 var commitToRewrite = repo.Lookup<Commit>("6dcf9bf");
                 var newParent = repo.Lookup<Commit>("41bc8c6");
                 bool hasBeenCalled = false;
 
                 repo.RewriteHistory(new[] { commitToRewrite }, parentRewriter: originalParents =>
                 {
-                    Assert.Empty(originalParents);
                     Assert.False(hasBeenCalled);
+                    Assert.Empty(originalParents);
                     hasBeenCalled = true;
                     return new[] { newParent };
                 });
