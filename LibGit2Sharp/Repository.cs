@@ -941,6 +941,14 @@ namespace LibGit2Sharp
             }
         }
 
+        /// <summary>
+        /// Rewrite some or all of the repository's commits and references
+        /// </summary>
+        /// <param name="commitsToRewrite">The <see cref="Commit"/>objects to rewrite</param>
+        /// <param name="commitHeaderRewriter">Visitor for rewriting commit metadata</param>
+        /// <param name="commitTreeRewriter">Visitor for rewriting commit trees</param>
+        /// <param name="referenceNameRewriter">Visitor for renaming backed-up refs</param>
+        /// <param name="parentRewriter">Visitor for mangling parent links</param>
         public virtual void RewriteHistory(
             IEnumerable<Commit> commitsToRewrite,
             Func<Commit, CommitRewriteInfo> commitHeaderRewriter = null,
@@ -996,7 +1004,7 @@ namespace LibGit2Sharp
                 if (!(reference is DirectReference))
                     continue;
 
-                // Avoid tags; chaining can get hairy
+                // TODO: deal with tags; chaining can get hairy
                 if (reference.IsTag())
                     continue;
 
