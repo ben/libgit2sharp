@@ -987,7 +987,7 @@ namespace LibGit2Sharp
             foreach (var reference in refsToRewrite)
             {
                 // Symbolic ref? Leave it alone
-                if (reference is SymbolicReference)
+                if (!(reference is DirectReference))
                     continue;
 
                 // Avoid tags; chaining can get hairy
