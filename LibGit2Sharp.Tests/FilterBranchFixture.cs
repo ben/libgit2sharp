@@ -17,12 +17,12 @@ namespace LibGit2Sharp.Tests
                 var commits = repo.Commits.QueryBy(new Filter{Since = repo.Refs}).ToArray();
 
                 // Noop header rewriter
-                repo.Branches.RewriteHistory(commits, commitHeaderRewriter: CommitHeader.From);
+                repo.RewriteHistory(commits, commitHeaderRewriter: CommitHeader.From);
                 Assert.Equal(originalRefs, repo.Refs.ToList().OrderBy(r => r.CanonicalName));
                 Assert.Equal(commits, repo.Commits.QueryBy(new Filter { Since = repo.Refs }).ToArray());
 
                 // Noop tree rewriter
-                repo.Branches.RewriteHistory(commits, commitTreeRewriter: TreeDefinition.From);
+                repo.RewriteHistory(commits, commitTreeRewriter: TreeDefinition.From);
                 Assert.Equal(originalRefs, repo.Refs.ToList().OrderBy(r => r.CanonicalName));
                 Assert.Equal(commits, repo.Commits.QueryBy(new Filter { Since = repo.Refs }).ToArray());
             }
@@ -35,7 +35,7 @@ namespace LibGit2Sharp.Tests
             using (var repo = new Repository(path))
             {
                 var commits = repo.Commits.QueryBy(new Filter { Since = repo.Refs }).ToArray();
-                repo.Branches.RewriteHistory(commits, commitHeaderRewriter: c =>
+                repo.RewriteHistory(commits, commitHeaderRewriter: c =>
                     {
                         var h = CommitHeader.From(c);
                         h.Author = new Signature("Ben Straub", "me@example.com", h.Author.When);
@@ -54,7 +54,7 @@ namespace LibGit2Sharp.Tests
             using (var repo = new Repository(path))
             {
                 var commits = repo.Head.Commits.ToArray();
-                repo.Branches.RewriteHistory(commits, commitTreeRewriter: c =>
+                repo.RewriteHistory(commits, commitTreeRewriter: c =>
                     {
                         var td = TreeDefinition.From(c);
                         td.Remove("README");

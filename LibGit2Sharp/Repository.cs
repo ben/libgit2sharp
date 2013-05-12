@@ -940,5 +940,69 @@ namespace LibGit2Sharp
                     Info.IsBare ? Info.Path : Info.WorkingDirectory);
             }
         }
+
+        public virtual void RewriteHistory(
+            IEnumerable<Commit> commits,
+            Func<Commit, CommitHeader> commitHeaderRewriter = null,
+            Func<Commit, TreeDefinition> commitTreeRewriter = null)
+        {
+            IList<Reference> originalRefs = Refs.ToList();
+            if (originalRefs.Count == 0)
+            {
+                // No ref to rewrite. What should we do here? Silently return? Throw InvalidOperationException?
+                return;
+            }
+
+            commitHeaderRewriter = commitHeaderRewriter ?? CommitHeader.From;
+            commitTreeRewriter = commitTreeRewriter ?? TreeDefinition.From;
+
+            // Find out which refs lead to at which one the commits
+            var refsToRewrite = Refs.SubsetOfTheseReferencesThatCanReachAnyOfTheseCommits(Refs, commits);
+
+            // TODO Back up the refs to refs/original
+
+            var shaMap = new Dictionary<Commit, Commit>();
+            foreach (var commit in Commits.QueryBy(new Filter { Since = refsToRewrite, SortBy = GitSortOptions.Reverse | GitSortOptions.Topological }))
+            {
+                // Get the new commit header
+                var newHeader = commitHeaderRewriter(commit);
+
+                // Get the new commit tree
+                var newTreeDefinition = commitTreeRewriter(commit);
+                var newTree = ObjectDatabase.CreateTree(newTreeDefinition);
+
+                // Find the new parents
+                var newParents = commit.Parents.Select(oldParent => shaMap.ContainsKey(oldParent) ? shaMap[oldParent] : oldParent).ToList();
+
+                // Create the new commit
+                var newCommit = ObjectDatabase.CreateCommit(newHeader.Message, newHeader.Author,
+                                                                 newHeader.Committer, newTree,
+                                                                 newParents);
+
+                // Record the rewrite
+                shaMap[commit] = newCommit;
+            }
+
+            // Rewrite the refs
+            foreach (var reference in refsToRewrite)
+            {
+                // Symbolic ref? Leave it alone
+                if (reference is SymbolicReference)
+                    continue;
+
+                // Avoid tags; chaining can get hairy
+                if (reference.IsTag())
+                    continue;
+
+                // Direct ref? Overwrite it, point to the new commit
+                var directRef = reference as DirectReference;
+                var oldCommit = directRef.Target as Commit;
+                if (oldCommit == null) continue;
+                if (shaMap.ContainsKey(oldCommit))
+                {
+                    Refs.UpdateTarget(directRef, shaMap[oldCommit].Id, "filter branch");
+                }
+            }
+        }
     }
 }
