@@ -942,10 +942,11 @@ namespace LibGit2Sharp
         }
 
         public virtual void RewriteHistory(
-            IEnumerable<Commit> commits,
+            IEnumerable<Commit> commitsToRewrite,
             Func<Commit, CommitRewriteInfo> commitHeaderRewriter = null,
             Func<Commit, TreeDefinition> commitTreeRewriter = null,
-            Func<string, string> referenceNameRewriter = null )
+            Func<string, string> referenceNameRewriter = null,
+            Func<IEnumerable<Commit>, IEnumerable<Commit>> parentRewriter = null )
         {
             IList<Reference> originalRefs = Refs.ToList();
             if (originalRefs.Count == 0)
@@ -957,9 +958,10 @@ namespace LibGit2Sharp
             commitHeaderRewriter = commitHeaderRewriter ?? CommitRewriteInfo.SameAs;
             commitTreeRewriter = commitTreeRewriter ?? TreeDefinition.From;
             referenceNameRewriter = referenceNameRewriter ?? (x => "refs/original/" + x);
+            parentRewriter = parentRewriter ?? (p => p);
 
             // Find out which refs lead to at least one the commits
-            var refsToRewrite = Refs.SubsetOfTheseReferencesThatCanReachAnyOfTheseCommits(Refs, commits).ToList();
+            var refsToRewrite = Refs.SubsetOfTheseReferencesThatCanReachAnyOfTheseCommits(Refs, commitsToRewrite).ToList();
 
             var shaMap = new Dictionary<Commit, Commit>();
             foreach (var commit in Commits.QueryBy(new Filter { Since = refsToRewrite, SortBy = GitSortOptions.Reverse | GitSortOptions.Topological }))
@@ -972,7 +974,11 @@ namespace LibGit2Sharp
                 var newTree = ObjectDatabase.CreateTree(newTreeDefinition);
 
                 // Find the new parents
-                var newParents = commit.Parents.Select(oldParent => shaMap.ContainsKey(oldParent) ? shaMap[oldParent] : oldParent).ToList();
+                var newParents = commit.Parents.Select(oldParent => shaMap.ContainsKey(oldParent) ? shaMap[oldParent] : oldParent);
+
+                // Only allow rewriting of the parents if this commit was directly asked for
+                if (commitsToRewrite.Contains(commit))
+                    newParents = parentRewriter(newParents);
 
                 // Create the new commit
                 var newCommit = ObjectDatabase.CreateCommit(newHeader.Message, newHeader.Author,

@@ -122,5 +122,44 @@ namespace LibGit2Sharp.Tests
                 Assert.Empty(repo.Refs.Where(x => x.CanonicalName.StartsWith("refs/original/original/")));
             }
         }
+
+        [Fact]
+        public void CanRewriteParents()
+        {
+            string path = CloneBareTestRepo();
+            using (var repo = new Repository(path))
+            {
+                // Graft the orphan "test" branch to the tip of "packed"
+                // Before:
+                // * e90810b  (test, lw, e90810b, test)
+                // |
+                // * 6dcf9bf
+                //
+                // * 41bc8c6  (packed)
+                // |
+                // * 5001298
+                // ... and after:
+                // * f558880  (test, lw, e90810b, test)
+                // |
+                // * 0c25efa
+                // |   <---- add this link
+                // * 41bc8c6  (packed)
+                // |
+                // * 5001298
+                var commitToRewrite = repo.Lookup<Commit>("6dcf9bf");
+                var newParent = repo.Lookup<Commit>("41bc8c6");
+                bool hasBeenCalled = false;
+
+                repo.RewriteHistory(new[] { commitToRewrite }, parentRewriter: originalParents =>
+                {
+                    Assert.Empty(originalParents);
+                    Assert.False(hasBeenCalled);
+                    hasBeenCalled = true;
+                    return new[] { newParent };
+                });
+
+                Assert.Contains(newParent, repo.Lookup<Commit>("refs/heads/test~").Parents);
+            }
+        }
     }
 }
