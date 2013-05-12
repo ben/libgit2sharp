@@ -961,7 +961,7 @@ namespace LibGit2Sharp
             parentRewriter = parentRewriter ?? (p => p);
 
             // Find out which refs lead to at least one the commits
-            var refsToRewrite = Refs.SubsetOfTheseReferencesThatCanReachAnyOfTheseCommits(Refs, commitsToRewrite).ToList();
+            var refsToRewrite = Refs.ReachableFrom(commitsToRewrite, Commits).ToList();
 
             var shaMap = new Dictionary<Commit, Commit>();
             foreach (var commit in Commits.QueryBy(new Filter { Since = refsToRewrite, SortBy = GitSortOptions.Reverse | GitSortOptions.Topological }))

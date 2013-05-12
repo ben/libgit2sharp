@@ -795,12 +795,11 @@ namespace LibGit2Sharp.Tests
         }
 
         [Fact]
-        public void CanDoThing()
+        public void CanQueryReachability()
         {
             using (var repo = new Repository(StandardTestRepoWorkingDirPath))
             {
-                var result = repo.Refs.SubsetOfTheseReferencesThatCanReachAnyOfTheseCommits(repo.Refs, new[] { repo.Lookup<Commit>("f8d44d7"), repo.Lookup<Commit>("6dcf9bf") });
-                // Should get "i-do-numbers" and "diff-test-cases"
+                var result = repo.Refs.ReachableFrom(new[] { repo.Lookup<Commit>("f8d44d7"), repo.Lookup<Commit>("6dcf9bf") }, repo.Commits);
                 var expected = new []
                 {
                     "refs/heads/diff-test-cases",
@@ -810,7 +809,7 @@ namespace LibGit2Sharp.Tests
                     "refs/tags/lw",
                     "refs/tags/test",
                 };
-                Assert.Equal(expected, result.Select(x => x.CanonicalName).OrderBy(x => x));
+                Assert.Equal(expected, result.Select(x => x.CanonicalName).OrderBy(x => x).ToList());
             }
         }
     }
