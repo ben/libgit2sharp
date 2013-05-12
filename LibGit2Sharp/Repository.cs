@@ -944,7 +944,8 @@ namespace LibGit2Sharp
         public virtual void RewriteHistory(
             IEnumerable<Commit> commits,
             Func<Commit, CommitRewriteInfo> commitHeaderRewriter = null,
-            Func<Commit, TreeDefinition> commitTreeRewriter = null)
+            Func<Commit, TreeDefinition> commitTreeRewriter = null,
+            Func<string, string> referenceNameRewriter = null )
         {
             IList<Reference> originalRefs = Refs.ToList();
             if (originalRefs.Count == 0)
@@ -955,11 +956,10 @@ namespace LibGit2Sharp
 
             commitHeaderRewriter = commitHeaderRewriter ?? CommitRewriteInfo.SameAs;
             commitTreeRewriter = commitTreeRewriter ?? TreeDefinition.From;
+            referenceNameRewriter = referenceNameRewriter ?? (x => "refs/original/" + x);
 
-            // Find out which refs lead to at which one the commits
-            var refsToRewrite = Refs.SubsetOfTheseReferencesThatCanReachAnyOfTheseCommits(Refs, commits);
-
-            // TODO Back up the refs to refs/original
+            // Find out which refs lead to at least one the commits
+            var refsToRewrite = Refs.SubsetOfTheseReferencesThatCanReachAnyOfTheseCommits(Refs, commits).ToList();
 
             var shaMap = new Dictionary<Commit, Commit>();
             foreach (var commit in Commits.QueryBy(new Filter { Since = refsToRewrite, SortBy = GitSortOptions.Reverse | GitSortOptions.Topological }))
@@ -1000,6 +1000,8 @@ namespace LibGit2Sharp
                 if (oldCommit == null) continue;
                 if (shaMap.ContainsKey(oldCommit))
                 {
+                    Refs.Add(referenceNameRewriter(reference.CanonicalName.Substring(5)), reference.TargetIdentifier, true,
+                             "rewrite history");
                     Refs.UpdateTarget(directRef, shaMap[oldCommit].Id, "filter branch");
                 }
             }
