@@ -7,7 +7,7 @@ namespace LibGit2Sharp
         public string Message { get; set; }
         public string Encoding { get; set; }
 
-        public static CommitRewriteInfo From(Commit c)
+        public static CommitRewriteInfo SameAs(Commit c)
         {
             return new CommitRewriteInfo
                 {
@@ -16,6 +16,17 @@ namespace LibGit2Sharp
                     Message = c.Message,
                     Encoding = c.Encoding,
                 };
+        }
+
+        public static CommitRewriteInfo From(Commit c, Signature author = null, Signature committer = null,
+                                             string message = null, string encoding = null)
+        {
+            var cri = SameAs(c);
+            cri.Author = author ?? cri.Author;
+            cri.Committer = committer ?? cri.Committer;
+            cri.Message = message ?? cri.Message;
+            cri.Encoding = encoding ?? cri.Encoding;
+            return cri;
         }
     }
 }

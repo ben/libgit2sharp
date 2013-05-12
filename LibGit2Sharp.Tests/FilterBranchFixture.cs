@@ -17,7 +17,7 @@ namespace LibGit2Sharp.Tests
                 var commits = repo.Commits.QueryBy(new Filter{Since = repo.Refs}).ToArray();
 
                 // Noop header rewriter
-                repo.RewriteHistory(commits, commitHeaderRewriter: CommitRewriteInfo.From);
+                repo.RewriteHistory(commits, commitHeaderRewriter: CommitRewriteInfo.SameAs);
                 Assert.Equal(originalRefs, repo.Refs.ToList().OrderBy(r => r.CanonicalName));
                 Assert.Equal(commits, repo.Commits.QueryBy(new Filter { Since = repo.Refs }).ToArray());
 
@@ -36,14 +36,11 @@ namespace LibGit2Sharp.Tests
             {
                 var commits = repo.Commits.QueryBy(new Filter { Since = repo.Refs }).ToArray();
                 repo.RewriteHistory(commits, commitHeaderRewriter: c =>
-                    {
-                        var h = CommitRewriteInfo.From(c);
-                        h.Author = new Signature("Ben Straub", "me@example.com", h.Author.When);
-                        return h;
-                    });
+                        CommitRewriteInfo.From(c, author: new Signature("Ben Straub", "me@example.com", c.Author.When)));
 
-                IEnumerable<Commit> collection = repo.Commits.QueryBy(new Filter {Since = repo.Refs.Where(x => !x.IsTag())}).Where(c => c.Author.Name != "Ben Straub");
-                Assert.Empty(collection);
+                var nonTagRefs = repo.Refs.Where(x => !x.IsTag());
+                Assert.Empty(repo.Commits.QueryBy(new Filter {Since = nonTagRefs})
+                                 .Where(c => c.Author.Name != "Ben Straub"));
             }
         }
 
@@ -53,16 +50,14 @@ namespace LibGit2Sharp.Tests
             string path = CloneBareTestRepo();
             using (var repo = new Repository(path))
             {
-                var commits = repo.Head.Commits.ToArray();
-                repo.RewriteHistory(commits, commitTreeRewriter: c =>
+                repo.RewriteHistory(repo.Head.Commits, commitTreeRewriter: c =>
                     {
                         var td = TreeDefinition.From(c);
                         td.Remove("README");
                         return td;
                     });
 
-                Assert.Empty(repo.Commits.QueryBy(new Filter {Since = repo.Head.Commits})
-                                 .Where(c => c["README"] != null));
+                Assert.Empty(repo.Head.Commits.Where(c => c["README"] != null));
             }
         }
     }

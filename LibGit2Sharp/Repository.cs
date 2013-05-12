@@ -953,7 +953,7 @@ namespace LibGit2Sharp
                 return;
             }
 
-            commitHeaderRewriter = commitHeaderRewriter ?? CommitRewriteInfo.From;
+            commitHeaderRewriter = commitHeaderRewriter ?? CommitRewriteInfo.SameAs;
             commitTreeRewriter = commitTreeRewriter ?? TreeDefinition.From;
 
             // Find out which refs lead to at which one the commits
