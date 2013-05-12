@@ -943,7 +943,7 @@ namespace LibGit2Sharp
 
         public virtual void RewriteHistory(
             IEnumerable<Commit> commits,
-            Func<Commit, CommitHeader> commitHeaderRewriter = null,
+            Func<Commit, CommitRewriteInfo> commitHeaderRewriter = null,
             Func<Commit, TreeDefinition> commitTreeRewriter = null)
         {
             IList<Reference> originalRefs = Refs.ToList();
@@ -953,7 +953,7 @@ namespace LibGit2Sharp
                 return;
             }
 
-            commitHeaderRewriter = commitHeaderRewriter ?? CommitHeader.From;
+            commitHeaderRewriter = commitHeaderRewriter ?? CommitRewriteInfo.From;
             commitTreeRewriter = commitTreeRewriter ?? TreeDefinition.From;
 
             // Find out which refs lead to at which one the commits

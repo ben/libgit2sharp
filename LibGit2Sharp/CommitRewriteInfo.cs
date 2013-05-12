@@ -1,15 +1,15 @@
 namespace LibGit2Sharp
 {
-    public class CommitHeader
+    public class CommitRewriteInfo
     {
         public Signature Author { get; set; }
         public Signature Committer { get; set; }
         public string Message { get; set; }
         public string Encoding { get; set; }
 
-        public static CommitHeader From(Commit c)
+        public static CommitRewriteInfo From(Commit c)
         {
-            return new CommitHeader
+            return new CommitRewriteInfo
                 {
                     Author = c.Author,
                     Committer = c.Committer,

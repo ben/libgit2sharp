@@ -19,7 +19,7 @@ namespace LibGit2Sharp.Tests
             typeof(RepositoryOptions),
             typeof(Signature),
             typeof(ExplicitPathsOptions),
-            typeof(CommitHeader),
+            typeof(CommitRewriteInfo),
         };
 
         // Related to https://github.com/libgit2/libgit2sharp/pull/251

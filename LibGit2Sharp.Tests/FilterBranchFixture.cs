@@ -17,7 +17,7 @@ namespace LibGit2Sharp.Tests
                 var commits = repo.Commits.QueryBy(new Filter{Since = repo.Refs}).ToArray();
 
                 // Noop header rewriter
-                repo.RewriteHistory(commits, commitHeaderRewriter: CommitHeader.From);
+                repo.RewriteHistory(commits, commitHeaderRewriter: CommitRewriteInfo.From);
                 Assert.Equal(originalRefs, repo.Refs.ToList().OrderBy(r => r.CanonicalName));
                 Assert.Equal(commits, repo.Commits.QueryBy(new Filter { Since = repo.Refs }).ToArray());
 
@@ -37,7 +37,7 @@ namespace LibGit2Sharp.Tests
                 var commits = repo.Commits.QueryBy(new Filter { Since = repo.Refs }).ToArray();
                 repo.RewriteHistory(commits, commitHeaderRewriter: c =>
                     {
-                        var h = CommitHeader.From(c);
+                        var h = CommitRewriteInfo.From(c);
                         h.Author = new Signature("Ben Straub", "me@example.com", h.Author.When);
                         return h;
                     });
