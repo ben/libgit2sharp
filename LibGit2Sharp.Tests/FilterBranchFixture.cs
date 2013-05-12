@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using LibGit2Sharp.Tests.TestHelpers;
 using Xunit;
+using Xunit.Sdk;
 
 namespace LibGit2Sharp.Tests
 {
@@ -117,7 +118,7 @@ namespace LibGit2Sharp.Tests
                 var commits = repo.Commits.QueryBy(new Filter { Since = repo.Refs }).ToArray();
                 repo.RewriteHistory(commits, commitHeaderRewriter: c => CommitRewriteInfo.From(c, message: "abc"));
 
-                // TODO: what should this do? Throw an exception? Allow forcing?
+                throw new AssertException("What should we do here?");
                 repo.RewriteHistory(commits, commitHeaderRewriter: c => CommitRewriteInfo.From(c, message: "abc"));
                 Assert.Empty(repo.Refs.Where(x => x.CanonicalName.StartsWith("refs/original/original/")));
             }
