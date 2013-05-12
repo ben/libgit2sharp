@@ -947,7 +947,7 @@ namespace LibGit2Sharp
         /// <param name="commitsToRewrite">The <see cref="Commit"/>objects to rewrite</param>
         /// <param name="commitHeaderRewriter">Visitor for rewriting commit metadata</param>
         /// <param name="commitTreeRewriter">Visitor for rewriting commit trees</param>
-        /// <param name="referenceNameRewriter">Visitor for renaming backed-up refs</param>
+        /// <param name="referenceNameRewriter">Visitor for renaming backed-up refs. If this returns null, that ref will not be backed up.</param>
         /// <param name="parentRewriter">Visitor for mangling parent links</param>
         public virtual void RewriteHistory(
             IEnumerable<Commit> commitsToRewrite,
@@ -1014,9 +1014,12 @@ namespace LibGit2Sharp
                 if (oldCommit == null) continue;
                 if (shaMap.ContainsKey(oldCommit))
                 {
-                    Refs.Add(referenceNameRewriter(reference.CanonicalName.Substring(5)), reference.TargetIdentifier, true,
-                             "rewrite history");
-                    Refs.UpdateTarget(directRef, shaMap[oldCommit].Id, "filter branch");
+                    var newName = referenceNameRewriter(reference.CanonicalName.Substring(5));
+                    if (newName != null)
+                    {
+                        Refs.Add(newName, reference.TargetIdentifier, true, "rewrite history");
+                        Refs.UpdateTarget(directRef, shaMap[oldCommit].Id, "filter branch");
+                    }
                 }
             }
         }

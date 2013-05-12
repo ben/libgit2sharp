@@ -87,6 +87,22 @@ namespace LibGit2Sharp.Tests
         }
 
         [Fact]
+        public void CanPreventRefsFromBeingBackedUp()
+        {
+            string path = CloneBareTestRepo();
+            using (var repo = new Repository(path))
+            {
+                var numberOfRefs = repo.Refs.Count();
+
+                repo.RewriteHistory(repo.Head.Commits, c => CommitRewriteInfo.From(c, message: "abc"),
+                    referenceNameRewriter: _ => null);
+
+                Assert.Equal(numberOfRefs, repo.Refs.Count());
+            }
+
+        }
+
+        [Fact]
         public void DoesNotRewriteRefsThatDontChange()
         {
             string path = CloneBareTestRepo();
