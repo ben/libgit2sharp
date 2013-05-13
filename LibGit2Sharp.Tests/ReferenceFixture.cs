@@ -812,5 +812,15 @@ namespace LibGit2Sharp.Tests
                 Assert.Equal(expected, result.Select(x => x.CanonicalName).OrderBy(x => x).ToList());
             }
         }
+
+        [Fact]
+        public void CanHandleInvalidArguments()
+        {
+            using (var repo = new Repository(StandardTestRepoWorkingDirPath))
+            {
+                Assert.Empty(repo.Refs.ReachableFrom(null));
+                Assert.Empty(repo.Refs.ReachableFrom(new Commit[]{}));
+            }
+        }
     }
 }

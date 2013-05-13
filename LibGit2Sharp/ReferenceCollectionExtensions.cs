@@ -185,14 +185,17 @@ namespace LibGit2Sharp
         public static IEnumerable<Reference> ReachableFrom(this IEnumerable<Reference> refs, IEnumerable<Commit> targets)
         {
             var result = new List<Reference>();
-            var targetsList = targets.ToList();
-            var allCommits = targets.First().repo.Commits;
+            if (targets == null) return result;
+
+            var targetsSet = new HashSet<Commit>(targets);
+            if (targetsSet.Count == 0) return result;
+            var allCommits = targetsSet.First().repo.Commits;
 
             foreach (var reference in refs)
             {
                 foreach (var commit in allCommits.QueryBy(new Filter {Since = reference}))
                 {
-                    if (!targetsList.Contains(commit)) continue;
+                    if (!targetsSet.Contains(commit)) continue;
                     result.Add(reference);
                     break;
                 }
