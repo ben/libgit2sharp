@@ -102,6 +102,15 @@ namespace LibGit2Sharp.Tests
 
         }
 
+        // This test should rewrite br2, but not packed-test:
+        // *   a4a7dce (br2) Merge branch 'master' into br2
+        // |\
+        // | * 9fd738e a fourth commit
+        // | * 4a202b3 (packed-test) a third commit
+        // * | c47800c branch commit one                <----- rewrite this one
+        // |/
+        // * 5b5b025 another commit
+        // * 8496071 testing
         [Fact]
         public void DoesNotRewriteRefsThatDontChange()
         {
@@ -115,16 +124,6 @@ namespace LibGit2Sharp.Tests
             }
         }
 
-
-        // This test should rewrite br2, but not packed-test:
-        // *   a4a7dce (br2) Merge branch 'master' into br2
-        // |\
-        // | * 9fd738e a fourth commit
-        // | * 4a202b3 (packed-test) a third commit
-        // * | c47800c branch commit one                <----- rewrite this one
-        // |/
-        // * 5b5b025 another commit
-        // * 8496071 testing
         [Fact]
         public void HandlesExistingBackedUpRefs()
         {
