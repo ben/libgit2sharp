@@ -799,7 +799,7 @@ namespace LibGit2Sharp.Tests
         {
             using (var repo = new Repository(StandardTestRepoWorkingDirPath))
             {
-                var result = repo.Refs.ReachableFrom(new[] { repo.Lookup<Commit>("f8d44d7"), repo.Lookup<Commit>("6dcf9bf") }, repo.Commits);
+                var result = repo.Refs.ReachableFrom(new[] { repo.Lookup<Commit>("f8d44d7"), repo.Lookup<Commit>("6dcf9bf") });
                 var expected = new []
                 {
                     "refs/heads/diff-test-cases",

@@ -181,14 +181,12 @@ namespace LibGit2Sharp
         /// </summary>
         /// <param name="refs">The set of <see cref="Reference"/>s to search.</param>
         /// <param name="targets">The set of <see cref="Commit"/>s that are interesting.</param>
-        /// <param name="allCommits">The entire <see cref="Commit"/> graph to search.</param>
         /// <returns>A subset of <paramref name="refs"/> that is reachable from <paramref name="targets"/>.</returns>
-        public static IEnumerable<Reference> ReachableFrom(this IEnumerable<Reference> refs,
-                                                           IEnumerable<Commit> targets,
-                                                           IQueryableCommitLog allCommits)
+        public static IEnumerable<Reference> ReachableFrom(this IEnumerable<Reference> refs, IEnumerable<Commit> targets)
         {
             var result = new List<Reference>();
             var targetsList = targets.ToList();
+            var allCommits = targets.First().repo.Commits;
 
             foreach (var reference in refs)
             {
