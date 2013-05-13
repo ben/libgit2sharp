@@ -25,7 +25,7 @@ namespace LibGit2Sharp
         /// </summary>
         /// <param name="commit">The <see cref="Commit"/> whose information is to be copied</param>
         /// <returns>A new <see cref="CommitRewriteInfo"/> object that matches the info for the <paramref name="commit"/>.</returns>
-        public static CommitRewriteInfo SameAs(Commit commit)
+        public static CommitRewriteInfo From(Commit commit)
         {
             return new CommitRewriteInfo
                 {
@@ -49,7 +49,7 @@ namespace LibGit2Sharp
                                              Signature committer = null,
                                              string message = null)
         {
-            var cri = SameAs(commit);
+            var cri = From(commit);
             cri.Author = author ?? cri.Author;
             cri.Committer = committer ?? cri.Committer;
             cri.Message = message ?? cri.Message;

@@ -19,7 +19,7 @@ namespace LibGit2Sharp.Tests
                 var commits = repo.Commits.QueryBy(new Filter { Since = repo.Refs }).ToArray();
 
                 // Noop header rewriter
-                repo.RewriteHistory(commits, commitHeaderRewriter: CommitRewriteInfo.SameAs);
+                repo.RewriteHistory(commits, commitHeaderRewriter: CommitRewriteInfo.From);
                 Assert.Equal(originalRefs,
                              repo.Refs.Where(x => !x.CanonicalName.StartsWith("refs/original"))
                                  .OrderBy(r => r.CanonicalName)

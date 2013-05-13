@@ -963,7 +963,7 @@ namespace LibGit2Sharp
                 return;
             }
 
-            commitHeaderRewriter = commitHeaderRewriter ?? CommitRewriteInfo.SameAs;
+            commitHeaderRewriter = commitHeaderRewriter ?? CommitRewriteInfo.From;
             commitTreeRewriter = commitTreeRewriter ?? TreeDefinition.From;
             referenceNameRewriter = referenceNameRewriter ?? (x => "refs/original/" + x);
             parentRewriter = parentRewriter ?? (p => p);
